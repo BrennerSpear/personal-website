@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Parser from 'rss-parser'
 
 // Enable full debugging
-const DEBUG = true;
+const DEBUG = true
 
 // Create a type for the RSS feed items with all possible fields
 type CustomFeedItem = {
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
   if (!url) {
     return NextResponse.json(
       { error: 'URL parameter is required' },
-      { status: 400 }
+      { status: 400 },
     )
   }
 
@@ -51,41 +51,47 @@ export async function GET(request: NextRequest) {
     })
 
     // Log for debugging
-    if (DEBUG) console.log(`Fetching RSS feed from: ${url}`);
-    
+    if (DEBUG) console.log(`Fetching RSS feed from: ${url}`)
+
     // Use node-fetch to get the raw XML
-    const response = await fetch(url);
-    const rawXml = await response.text();
-    
+    const response = await fetch(url)
+    const rawXml = await response.text()
+
     // Log for debugging
-    if (DEBUG) console.log(`Raw XML length: ${rawXml.length} bytes`);
-    if (DEBUG) console.log(`Raw XML sample: ${rawXml.substring(0, 200)}...`);
-    
+    if (DEBUG) console.log(`Raw XML length: ${rawXml.length} bytes`)
+    if (DEBUG) console.log(`Raw XML sample: ${rawXml.substring(0, 200)}...`)
+
     // Parse the feed
-    const feed = await parser.parseString(rawXml);
-    
+    const feed = await parser.parseString(rawXml)
+
     // Log for debugging
     if (DEBUG) {
-      console.log(`Feed title: ${feed.title}`);
-      console.log(`Items found: ${feed.items.length}`);
-      
+      console.log(`Feed title: ${feed.title}`)
+      console.log(`Items found: ${feed.items.length}`)
+
       if (feed.items.length > 0) {
-        const item = feed.items[0];
-        console.log(`First item title: ${item.title}`);
-        console.log(`First item has content:encoded: ${!!item['content:encoded']}`);
-        console.log(`First item has content: ${!!item.content}`);
-        console.log(`First item content:encoded length: ${item['content:encoded']?.length || 0}`);
-        console.log(`First item content length: ${item.content?.length || 0}`);
+        const item = feed.items[0]
+        if (item) {
+          console.log(`First item title: ${item.title || 'Untitled'}`)
+          console.log(
+            `First item has content:encoded: ${!!item['content:encoded']}`,
+          )
+          console.log(`First item has content: ${!!item.content}`)
+          console.log(
+            `First item content:encoded length: ${item['content:encoded']?.length || 0}`,
+          )
+          console.log(`First item content length: ${item.content?.length || 0}`)
+        }
       }
     }
-    
+
     return NextResponse.json({
       title: feed.title,
       description: feed.description,
-      items: feed.items.map(item => {
+      items: feed.items.map((item) => {
         // Prioritize content:encoded over content
-        const fullContent = item['content:encoded'] || item.content || '';
-        
+        const fullContent = item['content:encoded'] || item.content || ''
+
         return {
           title: item.title,
           link: item.link,
@@ -95,20 +101,22 @@ export async function GET(request: NextRequest) {
           contentSnippet: item.contentSnippet,
           guid: item.guid,
           // Include raw fields for debugging
-          rawFields: DEBUG ? {
-            hasContentEncoded: !!item['content:encoded'],
-            hasContent: !!item.content,
-            contentEncodedLength: item['content:encoded']?.length || 0,
-            contentLength: item.content?.length || 0,
-          } : undefined
-        };
+          rawFields: DEBUG
+            ? {
+                hasContentEncoded: !!item['content:encoded'],
+                hasContent: !!item.content,
+                contentEncodedLength: item['content:encoded']?.length || 0,
+                contentLength: item.content?.length || 0,
+              }
+            : undefined,
+        }
       }),
     })
   } catch (error) {
     console.error('Error fetching RSS feed:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch RSS feed', details: error.message },
-      { status: 500 }
+      { error: 'Failed to fetch RSS feed', details: error instanceof Error ? error.message : String(error) },
+      { status: 500 },
     )
   }
 }

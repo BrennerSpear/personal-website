@@ -5,13 +5,13 @@ import { cn } from '@/lib/utils'
 import { Star } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import {
-  siX,
+  siFarcaster,
   siGithub,
   siInstagram,
   siSubstack,
-  siFarcaster,
+  siX,
 } from 'simple-icons'
 
 // Combined post type for all sources
@@ -47,26 +47,31 @@ function formatShortDate(date: Date): string {
 // Extract slug from post URL
 function getSlugFromUrl(url: string): string {
   const urlParts = url.split('/')
-  return urlParts[urlParts.length - 1]
+  return urlParts[urlParts.length - 1] || ''
 }
 
-async function fetchSubstackPosts(feedUrl: string, publicationName: string): Promise<Post[]> {
+async function fetchSubstackPosts(
+  feedUrl: string,
+  publicationName: string,
+): Promise<Post[]> {
   try {
     // Use our internal API route to fetch the RSS feed
     const response = await fetch(`/api/rss?url=${encodeURIComponent(feedUrl)}`)
-    
+
     if (!response.ok) {
-      throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`)
+      throw new Error(
+        `Failed to fetch: ${response.status} ${response.statusText}`,
+      )
     }
-    
+
     const data = await response.json()
     console.log(`Feed "${publicationName}" fetched successfully:`, data.title)
     console.log('Items found:', data.items.length)
-    
-    return data.items.map(item => {
+
+    return data.items.map((item: any) => {
       const slug = getSlugFromUrl(item.link || '')
-      const date = new Date(item.pubDate || item.isoDate)
-      
+      const date = new Date(item.pubDate || item.isoDate || new Date())
+
       return {
         title: item.title,
         link: item.link,
@@ -75,7 +80,7 @@ async function fetchSubstackPosts(feedUrl: string, publicationName: string): Pro
         content: item.content,
         contentSnippet: item.contentSnippet,
         publication: publicationName,
-        slug: slug
+        slug: slug,
       }
     })
   } catch (error) {
@@ -93,21 +98,28 @@ export default function Home() {
 
   useEffect(() => {
     async function loadPosts() {
-      if (activeSection !== 'writings') return;
-      
-      setLoading(true);
-      
+      if (activeSection !== 'writings') return
+
+      setLoading(true)
+
       try {
         // Fetch posts from both publications
         const [metaversePosts, avanthropologyPosts] = await Promise.all([
-          fetchSubstackPosts('https://themetaverseiscoming.substack.com/feed', 'Into the Metaverse'),
-          fetchSubstackPosts('https://avanthropology.substack.com/feed', 'Avanthropology')
+          fetchSubstackPosts(
+            'https://themetaverseiscoming.substack.com/feed',
+            'Into the Metaverse',
+          ),
+          fetchSubstackPosts(
+            'https://avanthropology.substack.com/feed',
+            'Avanthropology',
+          ),
         ])
-        
+
         // Combine and sort all posts by date
-        const allPosts = [...metaversePosts, ...avanthropologyPosts]
-          .sort((a, b) => b.date.getTime() - a.date.getTime())
-        
+        const allPosts = [...metaversePosts, ...avanthropologyPosts].sort(
+          (a, b) => b.date.getTime() - a.date.getTime(),
+        )
+
         setPosts(allPosts)
       } catch (error) {
         console.error('Error loading posts:', error)
@@ -275,18 +287,20 @@ export default function Home() {
                 the intersection of digital economies and human behavior.
               </p>
               <p>
-                With a background in both software engineering and digital economics,
-                I've spent the last several years studying how new technologies are 
-                reshaping our social and economic landscape.
+                With a background in both software engineering and digital
+                economics, I've spent the last several years studying how new
+                technologies are reshaping our social and economic landscape.
               </p>
               <p>
-                Currently, I'm focused on exploring the future of digital identity, 
-                creator economies, and the evolution of online communities. I publish 
-                regularly through my Substack publications: "The Metaverse is Coming" and "Avanthropology."
+                Currently, I'm focused on exploring the future of digital
+                identity, creator economies, and the evolution of online
+                communities. I publish regularly through my Substack
+                publications: "The Metaverse is Coming" and "Avanthropology."
               </p>
               <p>
-                When I'm not writing or coding, you can find me experimenting with generative art,
-                collecting NFTs, or diving into the latest developments in blockchain and cryptocurrency.
+                When I'm not writing or coding, you can find me experimenting
+                with generative art, collecting NFTs, or diving into the latest
+                developments in blockchain and cryptocurrency.
               </p>
             </div>
           </div>
@@ -297,7 +311,7 @@ export default function Home() {
             <h2 className="text-lg font-semibold mb-4 border-b border-primary/20">
               Writings
             </h2>
-            
+
             {loading ? (
               <div className="py-4 text-center">
                 <p className="text-muted-foreground">Loading posts...</p>
@@ -325,7 +339,9 @@ export default function Home() {
               </ul>
             ) : (
               <div className="py-4">
-                <p className="text-muted-foreground">No posts available. Check back later.</p>
+                <p className="text-muted-foreground">
+                  No posts available. Check back later.
+                </p>
               </div>
             )}
           </div>

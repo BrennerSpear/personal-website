@@ -30,49 +30,64 @@ function formatDate(dateString: string): string {
 // Extract slug from post URL
 function getSlugFromUrl(url: string): string {
   const urlParts = url.split('/')
-  return urlParts[urlParts.length - 1]
+  return urlParts[urlParts.length - 1] || ''
 }
 
 // Function to clean up HTML content
 function cleanHtmlContent(html: string): string {
-  if (!html) return '';
-  
+  if (!html) return ''
+
   // Remove social buttons, sharing sections, and other Substack UI elements
-  let cleanedHtml = html;
-  
+  let cleanedHtml = html
+
   // Remove Substack buttons container
-  cleanedHtml = cleanedHtml.replace(/<div class="button-wrapper.*?<\/div>/gs, '');
-  
+  cleanedHtml = cleanedHtml.replace(
+    /<div class="button-wrapper.*?<\/div>/gs,
+    '',
+  )
+
   // Remove share buttons
-  cleanedHtml = cleanedHtml.replace(/<div class="share.*?<\/div>/gs, '');
-  
+  cleanedHtml = cleanedHtml.replace(/<div class="share.*?<\/div>/gs, '')
+
   // Remove subscription sections
-  cleanedHtml = cleanedHtml.replace(/<div class="subscription-widget.*?<\/div>/gs, '');
-  
+  cleanedHtml = cleanedHtml.replace(
+    /<div class="subscription-widget.*?<\/div>/gs,
+    '',
+  )
+
   // Remove "Like" buttons and counters
-  cleanedHtml = cleanedHtml.replace(/<button.*?like-button.*?<\/button>/gs, '');
-  
+  cleanedHtml = cleanedHtml.replace(/<button.*?like-button.*?<\/button>/gs, '')
+
   // Remove comment sections
-  cleanedHtml = cleanedHtml.replace(/<section class="comments.*?<\/section>/gs, '');
-  
+  cleanedHtml = cleanedHtml.replace(
+    /<section class="comments.*?<\/section>/gs,
+    '',
+  )
+
   // Remove any other UI elements with specific classes
-  cleanedHtml = cleanedHtml.replace(/<div class="button-container.*?<\/div>/gs, '');
-  cleanedHtml = cleanedHtml.replace(/<div class="social-share.*?<\/div>/gs, '');
-  
+  cleanedHtml = cleanedHtml.replace(
+    /<div class="button-container.*?<\/div>/gs,
+    '',
+  )
+  cleanedHtml = cleanedHtml.replace(/<div class="social-share.*?<\/div>/gs, '')
+
   // Remove Substack footer section (which often contains buttons)
-  cleanedHtml = cleanedHtml.replace(/<div class="post-footer.*?<\/div>/gs, '');
-  cleanedHtml = cleanedHtml.replace(/<div class="footer.*?<\/div>/gs, '');
-  
+  cleanedHtml = cleanedHtml.replace(/<div class="post-footer.*?<\/div>/gs, '')
+  cleanedHtml = cleanedHtml.replace(/<div class="footer.*?<\/div>/gs, '')
+
   // Remove any divs with IDs commonly used for UI elements
-  cleanedHtml = cleanedHtml.replace(/<div id="share-buttons.*?<\/div>/gs, '');
-  
+  cleanedHtml = cleanedHtml.replace(/<div id="share-buttons.*?<\/div>/gs, '')
+
   // Remove any div with "button" in its class name
-  cleanedHtml = cleanedHtml.replace(/<div[^>]*class="[^"]*button[^"]*".*?<\/div>/gs, '');
-  
+  cleanedHtml = cleanedHtml.replace(
+    /<div[^>]*class="[^"]*button[^"]*".*?<\/div>/gs,
+    '',
+  )
+
   // Remove any buttons
-  cleanedHtml = cleanedHtml.replace(/<button.*?<\/button>/gs, '');
-  
-  return cleanedHtml;
+  cleanedHtml = cleanedHtml.replace(/<button.*?<\/button>/gs, '')
+
+  return cleanedHtml
 }
 
 async function fetchPostFromRSS(slug: string): Promise<Article | null> {
@@ -80,48 +95,48 @@ async function fetchPostFromRSS(slug: string): Promise<Article | null> {
     // Try fetching from both RSS feeds
     const metaverseFeedUrl = 'https://themetaverseiscoming.substack.com/feed'
     const avanthropologyFeedUrl = 'https://avanthropology.substack.com/feed'
-    
+
     const [metaverseResponse, avanthropologyResponse] = await Promise.all([
       fetch(`/api/rss?url=${encodeURIComponent(metaverseFeedUrl)}`),
-      fetch(`/api/rss?url=${encodeURIComponent(avanthropologyFeedUrl)}`)
+      fetch(`/api/rss?url=${encodeURIComponent(avanthropologyFeedUrl)}`),
     ])
-    
+
     if (!metaverseResponse.ok || !avanthropologyResponse.ok) {
       throw new Error('Failed to fetch from one or both RSS feeds')
     }
-    
+
     const metaverseData = await metaverseResponse.json()
     const avanthropologyData = await avanthropologyResponse.json()
-    
+
     // Search in both feeds for the article with the matching slug
-    const metaverseArticle = metaverseData.items.find(item => {
+    const metaverseArticle = metaverseData.items.find((item: any) => {
       const itemSlug = getSlugFromUrl(item.link || '')
       return itemSlug === slug
     })
-    
-    const avanthropologyArticle = avanthropologyData.items.find(item => {
+
+    const avanthropologyArticle = avanthropologyData.items.find((item: any) => {
       const itemSlug = getSlugFromUrl(item.link || '')
       return itemSlug === slug
     })
-    
+
     // Use the article we found
     const foundArticle = metaverseArticle || avanthropologyArticle
-    
+
     if (!foundArticle) {
       console.error('Post not found with slug:', slug)
       return null
     }
-    
+
     // Clean up the HTML content to remove unwanted UI elements
     const cleanedContent = cleanHtmlContent(foundArticle.content || '')
-    
+
     return {
       title: foundArticle.title,
       link: foundArticle.link,
       pubDate: foundArticle.pubDate,
       content: cleanedContent,
       publication: metaverseArticle ? 'Into the Metaverse' : 'Avanthropology',
-      slug: slug
+      slug: slug,
     }
   } catch (error) {
     console.error('Error fetching post data:', error)
@@ -136,11 +151,11 @@ export default function ArticlePage({
 }) {
   const [article, setArticle] = useState<Article | null>(null)
   const [loading, setLoading] = useState(true)
-  
+
   // Unwrap params using React.use()
   const resolvedParams = React.use(params)
   const { slug } = resolvedParams
-  
+
   // Load article data
   useEffect(() => {
     async function loadArticle() {
@@ -153,14 +168,14 @@ export default function ArticlePage({
         setLoading(false)
       }
     }
-    
+
     loadArticle()
   }, [slug])
-  
+
   // Add style to ensure buttons don't show
   useEffect(() => {
     // Add CSS to hide any remaining buttons that might be in the content
-    const style = document.createElement('style');
+    const style = document.createElement('style')
     style.innerHTML = `
       /* Hide Substack UI elements */
       .button-wrapper, .button-container, .social-share, .share, .subscription-widget,
@@ -183,14 +198,14 @@ export default function ArticlePage({
       img[src*="facebook"], img[src*="twitter"], img[src*="linkedin"] {
         display: none !important;
       }
-    `;
-    document.head.appendChild(style);
-    
+    `
+    document.head.appendChild(style)
+
     return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
-  
+      document.head.removeChild(style)
+    }
+  }, [])
+
   if (loading) {
     return (
       <div className="container max-w-3xl mx-auto px-4 py-6">
@@ -210,7 +225,7 @@ export default function ArticlePage({
       </div>
     )
   }
-  
+
   if (!article) {
     notFound()
   }
