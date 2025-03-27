@@ -141,6 +141,7 @@ export default function ArticlePage({
   const resolvedParams = React.use(params)
   const { slug } = resolvedParams
   
+  // Load article data
   useEffect(() => {
     async function loadArticle() {
       try {
@@ -155,6 +156,40 @@ export default function ArticlePage({
     
     loadArticle()
   }, [slug])
+  
+  // Add style to ensure buttons don't show
+  useEffect(() => {
+    // Add CSS to hide any remaining buttons that might be in the content
+    const style = document.createElement('style');
+    style.innerHTML = `
+      /* Hide Substack UI elements */
+      .button-wrapper, .button-container, .social-share, .share, .subscription-widget,
+      button[class*="like"], section.comments, .post-footer, .footer,
+      div[class*="button"], div[id*="button"], button, .action-bar, 
+      div[class*="share"], div[class*="social"], div[class*="follow"], 
+      .subscribe-widget, .subscription-footer, .footer-wrapper {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        width: 0 !important;
+        overflow: hidden !important;
+        position: absolute !important;
+        pointer-events: none !important;
+      }
+      
+      /* Hide images that are often used as social buttons or UI elements */
+      img[src*="button"], img[src*="share"], img[src*="social"], 
+      img[src*="facebook"], img[src*="twitter"], img[src*="linkedin"] {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
   
   if (loading) {
     return (
@@ -179,7 +214,7 @@ export default function ArticlePage({
   if (!article) {
     notFound()
   }
-  
+
   return (
     <div className="container max-w-3xl mx-auto px-4 py-6">
       <header className="flex justify-between items-center mb-4">
