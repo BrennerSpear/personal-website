@@ -280,8 +280,13 @@ The Anti Anti Social Club isn't waiting for someone else to solve the problem of
 
 export default async function ArticlePage({
   params,
-}: { params: { slug: string } }) {
-  const article = articles.find((article) => article.slug === params.slug)
+}: {
+  params: { slug: string }
+}) {
+  // In Next.js 15, params needs to be awaited to access its properties
+  const { slug } = await params
+  // const { slug } = await params
+  const article = articles.find((article) => article.slug === slug)
 
   if (!article) {
     notFound()
