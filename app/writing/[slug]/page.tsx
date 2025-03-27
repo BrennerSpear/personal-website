@@ -278,7 +278,7 @@ The Anti Anti Social Club isn't waiting for someone else to solve the problem of
   },
 ]
 
-export default function ArticlePage({ params }: { params: { slug: string } }) {
+export default async function ArticlePage({ params }: { params: { slug: string } }) {
   const article = articles.find((article) => article.slug === params.slug)
 
   if (!article) {
