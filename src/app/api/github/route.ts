@@ -46,8 +46,8 @@ export async function GET() {
     // GitHub username - replace with yours
     const username = 'BrennerSpear'
     
-    // Fetch repos from GitHub API
-    const response = await fetch(`https://api.github.com/users/${username}/repos?sort=updated`, {
+    // Fetch repos from GitHub API - no sort parameter, we'll sort them ourselves
+    const response = await fetch(`https://api.github.com/users/${username}/repos?per_page=100`, {
       headers: {
         'Accept': 'application/vnd.github.v3+json',
         // Use GitHub token from env if available for higher rate limits
@@ -84,23 +84,26 @@ export async function GET() {
         }
       })
 
-    // Sort repos: featured first (by order), then by stars
-    const sortedRepos = processedRepos.sort((a, b) => {
-      // First sort by featured status
-      if (a.featured && !b.featured) return -1
-      if (!a.featured && b.featured) return 1
-      
-      // Then sort featured repos by order
-      if (a.featured && b.featured) {
+    // Sort all repositories by star count (highest first)
+    const starSortedRepos = [...processedRepos].sort((a, b) => b.stars - a.stars)
+    
+    // Get featured repos in their configured order
+    const featuredRepos = processedRepos
+      .filter(repo => repo.featured)
+      .sort((a, b) => {
+        // Sort by specified order if available
         if (a.order !== undefined && b.order !== undefined) {
           return a.order - b.order
         }
-        return b.stars - a.stars // Fallback to stars if order is not defined
-      }
-      
-      // Sort non-featured repos by stars
-      return b.stars - a.stars
-    })
+        // Fall back to stars for featured repos without explicit order
+        return b.stars - a.stars
+      })
+    
+    // Get non-featured repos sorted by stars
+    const nonFeaturedRepos = starSortedRepos.filter(repo => !repo.featured)
+    
+    // Combine: featured repos first (in order), then non-featured by stars
+    const sortedRepos = [...featuredRepos, ...nonFeaturedRepos]
 
     return NextResponse.json(sortedRepos)
   } catch (error) {
