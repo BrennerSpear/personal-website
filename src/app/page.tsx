@@ -1,5 +1,6 @@
 'use client'
 
+import { GitHubProject } from '@/components/github-project'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { cn } from '@/lib/utils'
 import { Star } from 'lucide-react'
@@ -89,18 +90,82 @@ async function fetchSubstackPosts(
   }
 }
 
+// GitHub project type
+interface GitHubProject {
+  name: string
+  description: string
+  language: string
+  stars: number
+  url: string
+  featured: boolean
+  order?: number
+  updatedAt: string
+}
+
 export default function Home() {
   const [activeSection, setActiveSection] = useState<
-    'about' | 'writings' | 'code' | 'vibe'
+    'about' | 'essays' | 'code' | 'vibe'
   >('about')
   const [posts, setPosts] = useState<Post[]>([])
-  const [loading, setLoading] = useState(true)
+  const [projects, setProjects] = useState<GitHubProject[]>([])
+  const [loadingPosts, setLoadingPosts] = useState(true)
+  const [loadingProjects, setLoadingProjects] = useState(true)
 
+  // Handle URL hash for section navigation
+  useEffect(() => {
+    // Function to check and set the active section based on hash
+    const updateSectionFromHash = () => {
+      // Get section from URL hash or default to 'about'
+      const hash = window.location.hash.replace('#', '')
+      const validSections = ['about', 'essays', 'code', 'vibe']
+      
+      if (hash && validSections.includes(hash)) {
+        setActiveSection(hash as 'about' | 'essays' | 'code' | 'vibe')
+      } else if (!hash && window.location.pathname === '/') {
+        // Set default hash if we're on the homepage with no hash
+        window.location.hash = 'about'
+      }
+    }
+
+    // Initial check
+    updateSectionFromHash()
+
+    // Listen for hash changes
+    window.addEventListener('hashchange', updateSectionFromHash)
+    return () => window.removeEventListener('hashchange', updateSectionFromHash)
+  }, [])
+
+  // Fetch GitHub repos
+  useEffect(() => {
+    async function fetchGitHubProjects() {
+      if (activeSection !== 'code') return
+      
+      setLoadingProjects(true)
+      
+      try {
+        const response = await fetch('/api/github')
+        if (!response.ok) {
+          throw new Error('Failed to fetch GitHub projects')
+        }
+        
+        const data = await response.json()
+        setProjects(data)
+      } catch (error) {
+        console.error('Error fetching GitHub projects:', error)
+      } finally {
+        setLoadingProjects(false)
+      }
+    }
+    
+    fetchGitHubProjects()
+  }, [activeSection])
+
+  // Load posts when in essays section
   useEffect(() => {
     async function loadPosts() {
-      if (activeSection !== 'writings') return
+      if (activeSection !== 'essays') return
 
-      setLoading(true)
+      setLoadingPosts(true)
 
       try {
         // Fetch posts from both publications
@@ -124,7 +189,7 @@ export default function Home() {
       } catch (error) {
         console.error('Error loading posts:', error)
       } finally {
-        setLoading(false)
+        setLoadingPosts(false)
       }
     }
 
@@ -150,7 +215,10 @@ export default function Home() {
 
           <div className="space-y-1">
             <button
-              onClick={() => setActiveSection('about')}
+              onClick={() => {
+                window.location.hash = 'about';
+                setActiveSection('about');
+              }}
               className={cn(
                 'text-sm w-full text-left px-1 py-0.5 hover:bg-muted rounded',
                 activeSection === 'about' && 'text-primary font-medium',
@@ -159,16 +227,22 @@ export default function Home() {
               About
             </button>
             <button
-              onClick={() => setActiveSection('writings')}
+              onClick={() => {
+                window.location.hash = 'essays';
+                setActiveSection('essays');
+              }}
               className={cn(
                 'text-sm w-full text-left px-1 py-0.5 hover:bg-muted rounded',
-                activeSection === 'writings' && 'text-primary font-medium',
+                activeSection === 'essays' && 'text-primary font-medium',
               )}
             >
-              Writings
+              Essays
             </button>
             <button
-              onClick={() => setActiveSection('code')}
+              onClick={() => {
+                window.location.hash = 'code';
+                setActiveSection('code');
+              }}
               className={cn(
                 'text-sm w-full text-left px-1 py-0.5 hover:bg-muted rounded',
                 activeSection === 'code' && 'text-primary font-medium',
@@ -177,7 +251,10 @@ export default function Home() {
               Code Projects
             </button>
             <button
-              onClick={() => setActiveSection('vibe')}
+              onClick={() => {
+                window.location.hash = 'vibe';
+                setActiveSection('vibe');
+              }}
               className={cn(
                 'text-sm w-full text-left px-1 py-0.5 hover:bg-muted rounded',
                 activeSection === 'vibe' && 'text-primary font-medium',
@@ -294,7 +371,7 @@ export default function Home() {
               <p>
                 Currently, I'm focused on exploring the future of digital
                 identity, creator economies, and the evolution of online
-                communities. I publish regularly through my Substack
+                communities. I publish regular essays through my Substack
                 publications: "The Metaverse is Coming" and "Avanthropology."
               </p>
               <p>
@@ -306,13 +383,13 @@ export default function Home() {
           </div>
         )}
 
-        {activeSection === 'writings' && (
+        {activeSection === 'essays' && (
           <div>
             <h2 className="text-lg font-semibold mb-4 border-b border-primary/20">
-              Writings
+              Essays
             </h2>
 
-            {loading ? (
+            {loadingPosts ? (
               <div className="py-4 text-center">
                 <p className="text-muted-foreground">Loading posts...</p>
               </div>
@@ -349,115 +426,84 @@ export default function Home() {
 
         {activeSection === 'code' && (
           <div>
-            <h2 className="text-lg font-semibold mb-2 border-b border-primary/20">
+            <h2 className="text-lg font-semibold mb-4 border-b border-primary/20">
               Code Projects
             </h2>
-            <ul className="text-sm space-y-3">
-              <li className="flex flex-col">
-                <div className="flex items-center justify-between">
-                  <Link
-                    href="#"
-                    className="text-primary hover:underline font-medium"
-                  >
-                    project-alpha
-                  </Link>
-                  <div className="flex items-center text-xs text-muted-foreground">
-                    <span className="mr-3">TypeScript</span>
-                    <div className="flex items-center">
-                      <Star className="h-3 w-3 mr-1 fill-current" />
-                      42
+            
+            {loadingProjects ? (
+              <div className="py-8 text-center">
+                <p className="text-muted-foreground">Loading GitHub projects...</p>
+              </div>
+            ) : (
+              <>
+                {projects.some(project => project.featured) && (
+                  <div className="mb-6">
+                    <h3 className="text-sm font-medium mb-3">Featured Projects</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {projects
+                        .filter(project => project.featured)
+                        .map((project) => (
+                          <GitHubProject
+                            key={project.name}
+                            name={project.name}
+                            description={project.description}
+                            language={project.language}
+                            stars={project.stars}
+                            url={project.url}
+                            featured={true}
+                          />
+                        ))}
                     </div>
                   </div>
-                </div>
-                <p className="text-muted-foreground text-xs">
-                  A decentralized application for NFT trading and marketplace
-                  analytics
-                </p>
-              </li>
-              <li className="flex flex-col">
-                <div className="flex items-center justify-between">
-                  <Link
-                    href="#"
-                    className="text-primary hover:underline font-medium"
-                  >
-                    crypto-analytics
-                  </Link>
-                  <div className="flex items-center text-xs text-muted-foreground">
-                    <span className="mr-3">Python</span>
-                    <div className="flex items-center">
-                      <Star className="h-3 w-3 mr-1 fill-current" />
-                      28
+                )}
+                
+                {projects.some(project => !project.featured) && (
+                  <>
+                    <h3 className="text-sm font-medium mb-3">Other Projects</h3>
+                    <div className="grid grid-cols-1 gap-3">
+                      {projects
+                        .filter(project => !project.featured)
+                        .slice(0, 5) // Limit to 5 non-featured projects
+                        .map((project) => (
+                          <div key={project.name} className="flex flex-col border-b border-border pb-2 last:border-0">
+                            <div className="flex items-center justify-between">
+                              <Link
+                                href={project.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary hover:underline font-medium"
+                              >
+                                {project.name}
+                              </Link>
+                              <div className="flex items-center text-xs text-muted-foreground">
+                                <span className="mr-3">{project.language || 'Unknown'}</span>
+                                <div className="flex items-center">
+                                  <Star className="h-3 w-3 mr-1 fill-current" />
+                                  {project.stars}
+                                </div>
+                              </div>
+                            </div>
+                            <p className="text-muted-foreground text-xs">
+                              {project.description || 'No description available'}
+                            </p>
+                          </div>
+                        ))}
                     </div>
-                  </div>
-                </div>
-                <p className="text-muted-foreground text-xs">
-                  Data visualization tools for cryptocurrency markets and trend
-                  analysis
-                </p>
-              </li>
-              <li className="flex flex-col">
-                <div className="flex items-center justify-between">
-                  <Link
-                    href="#"
-                    className="text-primary hover:underline font-medium"
-                  >
-                    metaverse-sdk
-                  </Link>
-                  <div className="flex items-center text-xs text-muted-foreground">
-                    <span className="mr-3">JavaScript</span>
-                    <div className="flex items-center">
-                      <Star className="h-3 w-3 mr-1 fill-current" />
-                      76
+                    
+                    <div className="mt-4 text-center">
+                      <Link 
+                        href="https://github.com/BrennerSpear" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-sm text-primary hover:underline"
+                      >
+                        View all projects on GitHub →
+                      </Link>
                     </div>
-                  </div>
-                </div>
-                <p className="text-muted-foreground text-xs">
-                  Developer toolkit for building metaverse experiences and
-                  virtual environments
-                </p>
-              </li>
-              <li className="flex flex-col">
-                <div className="flex items-center justify-between">
-                  <Link
-                    href="#"
-                    className="text-primary hover:underline font-medium"
-                  >
-                    blockchain-identity
-                  </Link>
-                  <div className="flex items-center text-xs text-muted-foreground">
-                    <span className="mr-3">Rust</span>
-                    <div className="flex items-center">
-                      <Star className="h-3 w-3 mr-1 fill-current" />
-                      54
-                    </div>
-                  </div>
-                </div>
-                <p className="text-muted-foreground text-xs">
-                  Decentralized identity solution using blockchain technology
-                </p>
-              </li>
-              <li className="flex flex-col">
-                <div className="flex items-center justify-between">
-                  <Link
-                    href="#"
-                    className="text-primary hover:underline font-medium"
-                  >
-                    defi-dashboard
-                  </Link>
-                  <div className="flex items-center text-xs text-muted-foreground">
-                    <span className="mr-3">TypeScript</span>
-                    <div className="flex items-center">
-                      <Star className="h-3 w-3 mr-1 fill-current" />
-                      31
-                    </div>
-                  </div>
-                </div>
-                <p className="text-muted-foreground text-xs">
-                  Dashboard for monitoring DeFi investments and portfolio
-                  performance
-                </p>
-              </li>
-            </ul>
+                  </>
+                )}
+              </>
+            )}
           </div>
         )}
 

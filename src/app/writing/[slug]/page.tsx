@@ -49,9 +49,9 @@ function cleanHtmlContent(html: string): string {
   // Remove share buttons
   cleanedHtml = cleanedHtml.replace(/<div class="share.*?<\/div>/gs, '')
 
-  // Remove subscription sections
+  // Remove subscription widget wrap editor completely
   cleanedHtml = cleanedHtml.replace(
-    /<div class="subscription-widget.*?<\/div>/gs,
+    /<div class="subscription-widget-wrap-editor".*?<\/div><\/div><\/div>/gs,
     '',
   )
 
@@ -86,6 +86,10 @@ function cleanHtmlContent(html: string): string {
 
   // Remove any buttons
   cleanedHtml = cleanedHtml.replace(/<button.*?<\/button>/gs, '')
+
+  // Remove all SVG elements and divs containing SVGs
+  cleanedHtml = cleanedHtml.replace(/<svg.*?<\/svg>/gs, '')
+  cleanedHtml = cleanedHtml.replace(/<div[^>]*>(\s*<svg.*?<\/svg>\s*)<\/div>/gs, '')
 
   return cleanedHtml
 }
@@ -178,11 +182,11 @@ export default function ArticlePage({
     const style = document.createElement('style')
     style.innerHTML = `
       /* Hide Substack UI elements */
-      .button-wrapper, .button-container, .social-share, .share, .subscription-widget,
+      .button-wrapper, .button-container, .social-share, .share,
       button[class*="like"], section.comments, .post-footer, .footer,
-      div[class*="button"], div[id*="button"], button, .action-bar, 
+      div[class*="button"]:not(.primary), div[id*="button"], button:not(.primary), .action-bar, 
       div[class*="share"], div[class*="social"], div[class*="follow"], 
-      .subscribe-widget, .subscription-footer, .footer-wrapper {
+      .subscription-footer, .footer-wrapper, .fake-input-wrapper {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
@@ -196,6 +200,18 @@ export default function ArticlePage({
       /* Hide images that are often used as social buttons or UI elements */
       img[src*="button"], img[src*="share"], img[src*="social"], 
       img[src*="facebook"], img[src*="twitter"], img[src*="linkedin"] {
+        display: none !important;
+      }
+      
+      /* Hide all SVG elements */
+      svg, div > svg, figure > svg, span > svg {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+      }
+      
+      /* Hide any subscription widget that might not be caught by the regex */
+      .subscription-widget-wrap-editor, .subscription-widget-subscribe, .subscription-widget {
         display: none !important;
       }
     `
@@ -259,6 +275,16 @@ export default function ArticlePage({
                      prose-blockquote:not-italic prose-blockquote:font-normal prose-blockquote:text-muted-foreground"
           dangerouslySetInnerHTML={{ __html: article.content }}
         />
+        
+        <div className="mt-12 pt-6 border-t border-border">
+          <Link
+            href="/#essays"
+            className="flex items-center text-primary hover:underline text-sm"
+          >
+            <ArrowLeft className="h-3 w-3 mr-1" />
+            Back to Essays
+          </Link>
+        </div>
       </article>
     </div>
   )
