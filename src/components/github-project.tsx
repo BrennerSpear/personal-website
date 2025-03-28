@@ -24,37 +24,34 @@ export function GitHubProject({
   fullName,
 }: GitHubProjectProps) {
   // Determine if this is an org repo (not owned by BrennerSpear)
-  const isOrgRepo = owner !== 'BrennerSpear';
+  const isOrgRepo = owner !== 'BrennerSpear'
   return (
-    <Card className={`h-full transition-shadow hover:shadow-md ${featured ? 'border-primary/20' : ''}`}>
-      <CardContent className="pt-6">
-        <Link 
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group"
-        >
-          <h3 className="text-lg font-medium mb-2 group-hover:text-primary transition-colors">
-            {isOrgRepo ? `${owner}/` : ''}{name}
-            {featured && <span className="ml-2 text-xs text-primary">★</span>}
-          </h3>
-        </Link>
-        <p className="text-muted-foreground text-sm mb-4">{description}</p>
+    <Card className="h-full transition-shadow hover:shadow-md">
+      <CardContent className="pt-3 pb-2">
+        <div className="flex flex-row items-center justify-between">
+          <div className="flex-1">
+            <Link
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group"
+            >
+              <h3 className="text-base font-medium group-hover:text-primary transition-colors">
+                {isOrgRepo ? `${owner}/` : ''}{name}
+              </h3>
+            </Link>
+            <p className="text-muted-foreground text-xs line-clamp-1">{description}</p>
+          </div>
+          
+          <div className="flex items-center space-x-3 text-xs text-muted-foreground">
+            <span>{language}</span>
+            <div className="flex items-center">
+              <Star className="h-3 w-3 mr-1 fill-current" />
+              {stars}
+            </div>
+          </div>
+        </div>
       </CardContent>
-      <CardFooter className="flex justify-between text-sm text-muted-foreground">
-        <div className="flex items-center">
-          {isOrgRepo && (
-            <span className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded mr-2">
-              org
-            </span>
-          )}
-          {language}
-        </div>
-        <div className="flex items-center">
-          <Star className="h-4 w-4 mr-1 fill-current" />
-          {stars}
-        </div>
-      </CardFooter>
     </Card>
   )
 }

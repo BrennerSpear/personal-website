@@ -100,6 +100,8 @@ interface GitHubProject {
   featured: boolean
   order?: number
   updatedAt: string
+  owner: string
+  fullName: string
 }
 
 export default function Home() {
@@ -110,6 +112,7 @@ export default function Home() {
   const [projects, setProjects] = useState<GitHubProject[]>([])
   const [loadingPosts, setLoadingPosts] = useState(true)
   const [loadingProjects, setLoadingProjects] = useState(true)
+  const [projectError, setProjectError] = useState<string | null>(null)
 
   // Handle URL hash for section navigation
   useEffect(() => {
@@ -118,7 +121,7 @@ export default function Home() {
       // Get section from URL hash or default to 'about'
       const hash = window.location.hash.replace('#', '')
       const validSections = ['about', 'essays', 'code', 'vibe']
-      
+
       if (hash && validSections.includes(hash)) {
         setActiveSection(hash as 'about' | 'essays' | 'code' | 'vibe')
       } else if (!hash && window.location.pathname === '/') {
@@ -139,24 +142,32 @@ export default function Home() {
   useEffect(() => {
     async function fetchGitHubProjects() {
       if (activeSection !== 'code') return
-      
+
       setLoadingProjects(true)
-      
+
       try {
         const response = await fetch('/api/github')
         if (!response.ok) {
           throw new Error('Failed to fetch GitHub projects')
         }
-        
+
         const data = await response.json()
-        setProjects(data)
+        
+        if (Array.isArray(data) && data.length > 0) {
+          setProjects(data)
+          setProjectError(null)
+        } else {
+          console.error('GitHub API returned no projects')
+          setProjectError('No GitHub projects found')
+        }
       } catch (error) {
         console.error('Error fetching GitHub projects:', error)
+        setProjectError('Error loading GitHub projects')
       } finally {
         setLoadingProjects(false)
       }
     }
-    
+
     fetchGitHubProjects()
   }, [activeSection])
 
@@ -216,8 +227,8 @@ export default function Home() {
           <div className="space-y-1">
             <button
               onClick={() => {
-                window.location.hash = 'about';
-                setActiveSection('about');
+                window.location.hash = 'about'
+                setActiveSection('about')
               }}
               className={cn(
                 'text-sm w-full text-left px-1 py-0.5 hover:bg-muted rounded',
@@ -228,8 +239,8 @@ export default function Home() {
             </button>
             <button
               onClick={() => {
-                window.location.hash = 'essays';
-                setActiveSection('essays');
+                window.location.hash = 'essays'
+                setActiveSection('essays')
               }}
               className={cn(
                 'text-sm w-full text-left px-1 py-0.5 hover:bg-muted rounded',
@@ -240,8 +251,8 @@ export default function Home() {
             </button>
             <button
               onClick={() => {
-                window.location.hash = 'code';
-                setActiveSection('code');
+                window.location.hash = 'code'
+                setActiveSection('code')
               }}
               className={cn(
                 'text-sm w-full text-left px-1 py-0.5 hover:bg-muted rounded',
@@ -252,8 +263,8 @@ export default function Home() {
             </button>
             <button
               onClick={() => {
-                window.location.hash = 'vibe';
-                setActiveSection('vibe');
+                window.location.hash = 'vibe'
+                setActiveSection('vibe')
               }}
               className={cn(
                 'text-sm w-full text-left px-1 py-0.5 hover:bg-muted rounded',
@@ -429,82 +440,54 @@ export default function Home() {
             <h2 className="text-lg font-semibold mb-4 border-b border-primary/20">
               Code Projects
             </h2>
-            
+
             {loadingProjects ? (
               <div className="py-8 text-center">
-                <p className="text-muted-foreground">Loading GitHub projects...</p>
+                <p className="text-muted-foreground">
+                  Loading GitHub projects...
+                </p>
+              </div>
+            ) : projectError ? (
+              <div className="py-4 text-center">
+                <p className="text-muted-foreground">
+                  {projectError}. <Link href="https://github.com/BrennerSpear" className="text-primary hover:underline">View all projects on GitHub</Link>
+                </p>
+              </div>
+            ) : projects.length === 0 ? (
+              <div className="py-4 text-center">
+                <p className="text-muted-foreground">
+                  No GitHub projects found. <Link href="https://github.com/BrennerSpear" className="text-primary hover:underline">View all projects on GitHub</Link>
+                </p>
               </div>
             ) : (
-              <>
-                {projects.some(project => project.featured) && (
-                  <div className="mb-6">
-                    <h3 className="text-sm font-medium mb-3">Featured Projects</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {projects
-                        .filter(project => project.featured)
-                        .map((project) => (
-                          <GitHubProject
-                            key={project.fullName || project.name}
-                            name={project.name}
-                            description={project.description}
-                            language={project.language}
-                            stars={project.stars}
-                            url={project.url}
-                            owner={project.owner}
-                            fullName={project.fullName}
-                            featured={true}
-                          />
-                        ))}
-                    </div>
-                  </div>
-                )}
-                
-                {projects.some(project => !project.featured) && (
-                  <>
-                    <h3 className="text-sm font-medium mb-3">Other Projects</h3>
-                    <div className="grid grid-cols-1 gap-3">
-                      {projects
-                        .filter(project => !project.featured)
-                        .slice(0, 5) // Limit to 5 non-featured projects
-                        .map((project) => (
-                          <div key={project.name} className="flex flex-col border-b border-border pb-2 last:border-0">
-                            <div className="flex items-center justify-between">
-                              <Link
-                                href={project.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-primary hover:underline font-medium"
-                              >
-                                {project.name}
-                              </Link>
-                              <div className="flex items-center text-xs text-muted-foreground">
-                                <span className="mr-3">{project.language || 'Unknown'}</span>
-                                <div className="flex items-center">
-                                  <Star className="h-3 w-3 mr-1 fill-current" />
-                                  {project.stars}
-                                </div>
-                              </div>
-                            </div>
-                            <p className="text-muted-foreground text-xs">
-                              {project.description || 'No description available'}
-                            </p>
-                          </div>
-                        ))}
-                    </div>
-                    
-                    <div className="mt-4 text-center">
-                      <Link 
-                        href="https://github.com/BrennerSpear" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-sm text-primary hover:underline"
-                      >
-                        View all projects on GitHub →
-                      </Link>
-                    </div>
-                  </>
-                )}
-              </>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 gap-2">
+                  {projects.map((project) => (
+                    <GitHubProject
+                      key={project.fullName || project.name}
+                      name={project.name}
+                      description={project.description}
+                      language={project.language}
+                      stars={project.stars}
+                      url={project.url}
+                      owner={project.owner}
+                      fullName={project.fullName}
+                      featured={false}
+                    />
+                  ))}
+                </div>
+
+                <div className="mt-4 text-center">
+                  <Link
+                    href="https://github.com/BrennerSpear"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-primary hover:underline"
+                  >
+                    View more projects on GitHub →
+                  </Link>
+                </div>
+              </div>
             )}
           </div>
         )}
