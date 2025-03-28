@@ -444,12 +444,14 @@ export default function Home() {
                         .filter(project => project.featured)
                         .map((project) => (
                           <GitHubProject
-                            key={project.name}
+                            key={project.fullName || project.name}
                             name={project.name}
                             description={project.description}
                             language={project.language}
                             stars={project.stars}
                             url={project.url}
+                            owner={project.owner}
+                            fullName={project.fullName}
                             featured={true}
                           />
                         ))}
