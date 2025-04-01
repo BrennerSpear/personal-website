@@ -37,12 +37,15 @@ export function GitHubProject({
               className="group"
             >
               <h3 className="text-base font-medium group-hover:text-primary transition-colors">
-                {isOrgRepo ? `${owner}/` : ''}{name}
+                {isOrgRepo ? `${owner}/` : ''}
+                {name}
               </h3>
             </Link>
-            <p className="text-muted-foreground text-xs line-clamp-1">{description}</p>
+            <p className="text-muted-foreground text-xs line-clamp-1">
+              {description}
+            </p>
           </div>
-          
+
           <div className="flex items-center space-x-3 text-xs text-muted-foreground">
             <span>{language}</span>
             <div className="flex items-center">

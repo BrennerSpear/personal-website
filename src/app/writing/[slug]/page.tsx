@@ -89,7 +89,10 @@ function cleanHtmlContent(html: string): string {
 
   // Remove all SVG elements and divs containing SVGs
   cleanedHtml = cleanedHtml.replace(/<svg.*?<\/svg>/gs, '')
-  cleanedHtml = cleanedHtml.replace(/<div[^>]*>(\s*<svg.*?<\/svg>\s*)<\/div>/gs, '')
+  cleanedHtml = cleanedHtml.replace(
+    /<div[^>]*>(\s*<svg.*?<\/svg>\s*)<\/div>/gs,
+    '',
+  )
 
   return cleanedHtml
 }
@@ -113,15 +116,19 @@ async function fetchPostFromRSS(slug: string): Promise<Article | null> {
     const avanthropologyData = await avanthropologyResponse.json()
 
     // Search in both feeds for the article with the matching slug
-    const metaverseArticle = metaverseData.items.find((item: any) => {
-      const itemSlug = getSlugFromUrl(item.link || '')
-      return itemSlug === slug
-    })
+    const metaverseArticle = metaverseData.items.find(
+      (item: { link: string }) => {
+        const itemSlug = getSlugFromUrl(item.link || '')
+        return itemSlug === slug
+      },
+    )
 
-    const avanthropologyArticle = avanthropologyData.items.find((item: any) => {
-      const itemSlug = getSlugFromUrl(item.link || '')
-      return itemSlug === slug
-    })
+    const avanthropologyArticle = avanthropologyData.items.find(
+      (item: { link: string }) => {
+        const itemSlug = getSlugFromUrl(item.link || '')
+        return itemSlug === slug
+      },
+    )
 
     // Use the article we found
     const foundArticle = metaverseArticle || avanthropologyArticle
@@ -275,7 +282,7 @@ export default function ArticlePage({
                      prose-blockquote:not-italic prose-blockquote:font-normal prose-blockquote:text-muted-foreground"
           dangerouslySetInnerHTML={{ __html: article.content }}
         />
-        
+
         <div className="mt-12 pt-6 border-t border-border">
           <Link
             href="/#essays"

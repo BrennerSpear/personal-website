@@ -133,18 +133,23 @@ export async function GET() {
       })
 
     // Define the names of repositories we want to display
-    const wantedRepoNames = ['evm-translator', 'coinbase_pro_bot_aws_lambda', 'onoma', 'vibe-extension']
-    
+    const wantedRepoNames = [
+      'evm-translator',
+      'coinbase_pro_bot_aws_lambda',
+      'onoma',
+      'vibe-extension',
+    ]
+
     // Filter to only include these specific repos
     const specificRepos = processedRepos
-      .filter(repo => wantedRepoNames.includes(repo.name))
+      .filter((repo) => wantedRepoNames.includes(repo.name))
       .sort((a, b) => {
         // Custom sort order based on our desired sequence
         const order: Record<string, number> = {
           'evm-translator': 1,
-          'coinbase_pro_bot_aws_lambda': 2,
-          'onoma': 3,
-          'vibe-extension': 4
+          coinbase_pro_bot_aws_lambda: 2,
+          onoma: 3,
+          'vibe-extension': 4,
         }
         return (order[a.name] || 99) - (order[b.name] || 99)
       })
