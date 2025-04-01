@@ -113,9 +113,92 @@ interface GitHubProject {
   fullName: string
 }
 
+// Book recommendation type
+interface Book {
+  title: string
+  author: string
+  year: number
+  coverUrl: string
+  goodreadsRating: number
+  goodreadsUrl: string
+  description: string
+}
+
+// Sample book data
+const recommendedBooks: Book[] = [
+  {
+    title: 'Sapiens: A Brief History of Humankind',
+    author: 'Yuval Noah Harari',
+    year: 2014,
+    coverUrl:
+      'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1595674533i/23692271.jpg',
+    goodreadsRating: 4.37,
+    goodreadsUrl: 'https://www.goodreads.com/book/show/23692271-sapiens',
+    description:
+      "Compelling narrative of humanity's evolution, culture, and future prospects",
+  },
+  {
+    title: 'Thinking, Fast and Slow',
+    author: 'Daniel Kahneman',
+    year: 2011,
+    coverUrl:
+      'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1317793965i/11468377.jpg',
+    goodreadsRating: 4.18,
+    goodreadsUrl:
+      'https://www.goodreads.com/book/show/11468377-thinking-fast-and-slow',
+    description:
+      'Transformed my understanding of decision-making and cognitive biases',
+  },
+  {
+    title: 'Zero to One',
+    author: 'Peter Thiel',
+    year: 2014,
+    coverUrl:
+      'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1630663027i/18050143.jpg',
+    goodreadsRating: 4.16,
+    goodreadsUrl: 'https://www.goodreads.com/book/show/18050143-zero-to-one',
+    description:
+      'Essential perspective on building startups that create truly new value',
+  },
+  {
+    title: 'The Three-Body Problem',
+    author: 'Liu Cixin',
+    year: 2008,
+    coverUrl:
+      'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1415428227i/20518872.jpg',
+    goodreadsRating: 4.08,
+    goodreadsUrl:
+      'https://www.goodreads.com/book/show/20518872-the-three-body-problem',
+    description:
+      'Mind-bending sci-fi that reframes how I think about cosmic civilizations',
+  },
+  {
+    title: 'Snow Crash',
+    author: 'Neal Stephenson',
+    year: 1992,
+    coverUrl:
+      'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1589842773i/40651883.jpg',
+    goodreadsRating: 4.03,
+    goodreadsUrl: 'https://www.goodreads.com/book/show/40651883-snow-crash',
+    description:
+      'The metaverse blueprint that influenced decades of technological development',
+  },
+  {
+    title: 'Atomic Habits',
+    author: 'James Clear',
+    year: 2018,
+    coverUrl:
+      'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1655988385i/40121378.jpg',
+    goodreadsRating: 4.36,
+    goodreadsUrl: 'https://www.goodreads.com/book/show/40121378-atomic-habits',
+    description:
+      'Practical framework for building good habits and breaking bad ones',
+  },
+]
+
 export default function Home() {
   const [activeSection, setActiveSection] = useState<
-    'about' | 'essays' | 'code' | 'vibe' | 'skiing' | 'articles'
+    'about' | 'essays' | 'code' | 'vibe' | 'skiing' | 'articles' | 'books'
   >('about')
   const [posts, setPosts] = useState<Post[]>([])
   const [projects, setProjects] = useState<GitHubProject[]>([])
@@ -136,11 +219,19 @@ export default function Home() {
         'vibe',
         'skiing',
         'articles',
+        'books',
       ]
 
       if (hash && validSections.includes(hash)) {
         setActiveSection(
-          hash as 'about' | 'essays' | 'code' | 'vibe' | 'skiing' | 'articles',
+          hash as
+            | 'about'
+            | 'essays'
+            | 'code'
+            | 'vibe'
+            | 'skiing'
+            | 'articles'
+            | 'books',
         )
       } else if (!hash && window.location.pathname === '/') {
         // Set default hash if we're on the homepage with no hash
@@ -314,6 +405,18 @@ export default function Home() {
               )}
             >
               Articles
+            </button>
+            <button
+              onClick={() => {
+                window.location.hash = 'books'
+                setActiveSection('books')
+              }}
+              className={cn(
+                'text-sm w-full text-left px-1 py-0.5 hover:bg-muted rounded',
+                activeSection === 'books' && 'text-primary font-medium',
+              )}
+            >
+              Books
             </button>
           </div>
 
@@ -773,6 +876,78 @@ export default function Home() {
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'books' && (
+          <div>
+            <h2 className="text-lg font-semibold mb-4 border-b border-primary/20">
+              Recommended Books
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+              {recommendedBooks.map((book, index) => (
+                <div
+                  key={index}
+                  className="bg-card text-card-foreground border rounded-lg overflow-hidden transition-all duration-200 hover:scale-105 hover:shadow-md flex flex-col"
+                >
+                  <div className="relative h-56 bg-muted">
+                    <a
+                      href={book.goodreadsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block h-full"
+                    >
+                      <Image
+                        src={book.coverUrl}
+                        alt={`${book.title} book cover`}
+                        fill
+                        className="object-contain"
+                      />
+                    </a>
+                  </div>
+                  <div className="p-3 flex-1 flex flex-col">
+                    <div className="flex justify-between items-start mb-1">
+                      <h3 className="font-medium text-sm leading-tight">
+                        {book.title}
+                      </h3>
+                      <div className="flex items-center text-amber-500 ml-1 shrink-0">
+                        <Star className="h-3.5 w-3.5 mr-0.5" />
+                        <span className="text-xs">{book.goodreadsRating}</span>
+                      </div>
+                    </div>
+                    <div className="text-xs text-muted-foreground mb-1">
+                      {book.author} • {book.year}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-auto">
+                      {book.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 text-center">
+              <a
+                href="https://www.goodreads.com/user/show/71264931-brenner-spear"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-primary hover:underline inline-flex items-center"
+              >
+                View my full reading list on Goodreads
+                <svg
+                  className="h-4 w-4 ml-1"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+              </a>
             </div>
           </div>
         )}
