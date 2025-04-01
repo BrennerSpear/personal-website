@@ -69,21 +69,30 @@ async function fetchSubstackPosts(
     console.log(`Feed "${publicationName}" fetched successfully:`, data.title)
     console.log('Items found:', data.items.length)
 
-    return data.items.map((item: any) => {
-      const slug = getSlugFromUrl(item.link || '')
-      const date = new Date(item.pubDate || item.isoDate || new Date())
+    return data.items.map(
+      (item: {
+        title: string
+        link: string
+        pubDate: string
+        isoDate?: string
+        content: string
+        contentSnippet?: string
+      }) => {
+        const slug = getSlugFromUrl(item.link || '')
+        const date = new Date(item.pubDate || item.isoDate || new Date())
 
-      return {
-        title: item.title,
-        link: item.link,
-        pubDate: item.pubDate,
-        date: date,
-        content: item.content,
-        contentSnippet: item.contentSnippet,
-        publication: publicationName,
-        slug: slug,
-      }
-    })
+        return {
+          title: item.title,
+          link: item.link,
+          pubDate: item.pubDate,
+          date: date,
+          content: item.content,
+          contentSnippet: item.contentSnippet,
+          publication: publicationName,
+          slug: slug,
+        }
+      },
+    )
   } catch (error) {
     console.error(`Error fetching ${publicationName} feed:`, error)
     return []
@@ -106,7 +115,7 @@ interface GitHubProject {
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState<
-    'about' | 'essays' | 'code' | 'vibe'
+    'about' | 'essays' | 'code' | 'vibe' | 'skiing' | 'articles'
   >('about')
   const [posts, setPosts] = useState<Post[]>([])
   const [projects, setProjects] = useState<GitHubProject[]>([])
@@ -120,10 +129,19 @@ export default function Home() {
     const updateSectionFromHash = () => {
       // Get section from URL hash or default to 'about'
       const hash = window.location.hash.replace('#', '')
-      const validSections = ['about', 'essays', 'code', 'vibe']
+      const validSections = [
+        'about',
+        'essays',
+        'code',
+        'vibe',
+        'skiing',
+        'articles',
+      ]
 
       if (hash && validSections.includes(hash)) {
-        setActiveSection(hash as 'about' | 'essays' | 'code' | 'vibe')
+        setActiveSection(
+          hash as 'about' | 'essays' | 'code' | 'vibe' | 'skiing' | 'articles',
+        )
       } else if (!hash && window.location.pathname === '/') {
         // Set default hash if we're on the homepage with no hash
         window.location.hash = 'about'
@@ -152,7 +170,7 @@ export default function Home() {
         }
 
         const data = await response.json()
-        
+
         if (Array.isArray(data) && data.length > 0) {
           setProjects(data)
           setProjectError(null)
@@ -272,6 +290,30 @@ export default function Home() {
               )}
             >
               Vibe Projects
+            </button>
+            <button
+              onClick={() => {
+                window.location.hash = 'skiing'
+                setActiveSection('skiing')
+              }}
+              className={cn(
+                'text-sm w-full text-left px-1 py-0.5 hover:bg-muted rounded',
+                activeSection === 'skiing' && 'text-primary font-medium',
+              )}
+            >
+              Skiing
+            </button>
+            <button
+              onClick={() => {
+                window.location.hash = 'articles'
+                setActiveSection('articles')
+              }}
+              className={cn(
+                'text-sm w-full text-left px-1 py-0.5 hover:bg-muted rounded',
+                activeSection === 'articles' && 'text-primary font-medium',
+              )}
+            >
+              Articles
             </button>
           </div>
 
@@ -450,13 +492,25 @@ export default function Home() {
             ) : projectError ? (
               <div className="py-4 text-center">
                 <p className="text-muted-foreground">
-                  {projectError}. <Link href="https://github.com/BrennerSpear" className="text-primary hover:underline">View all projects on GitHub</Link>
+                  {projectError}.{' '}
+                  <Link
+                    href="https://github.com/BrennerSpear"
+                    className="text-primary hover:underline"
+                  >
+                    View all projects on GitHub
+                  </Link>
                 </p>
               </div>
             ) : projects.length === 0 ? (
               <div className="py-4 text-center">
                 <p className="text-muted-foreground">
-                  No GitHub projects found. <Link href="https://github.com/BrennerSpear" className="text-primary hover:underline">View all projects on GitHub</Link>
+                  No GitHub projects found.{' '}
+                  <Link
+                    href="https://github.com/BrennerSpear"
+                    className="text-primary hover:underline"
+                  >
+                    View all projects on GitHub
+                  </Link>
                 </p>
               </div>
             ) : (
@@ -558,6 +612,168 @@ export default function Home() {
                 </p>
               </li>
             </ul>
+          </div>
+        )}
+
+        {activeSection === 'skiing' && (
+          <div>
+            <h2 className="text-lg font-semibold mb-2 border-b border-primary/20">
+              Skiing
+            </h2>
+            <div className="text-muted-foreground text-sm mt-4">TBD</div>
+          </div>
+        )}
+
+        {activeSection === 'articles' && (
+          <div>
+            <h2 className="text-lg font-semibold mb-4 border-b border-primary/20">
+              Recommended Articles
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="bg-card text-card-foreground border rounded-lg overflow-hidden transition-all duration-200 hover:scale-105 hover:shadow-md">
+                <div className="h-40 bg-muted relative">
+                  <Image
+                    src="/placeholder.jpg"
+                    alt="Article thumbnail"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <div className="text-xs text-muted-foreground mb-1">
+                    The Atlantic • Adam Grant • March 2022
+                  </div>
+                  <h3 className="font-medium text-sm mb-1">
+                    The Science of Productive Disagreement
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Essential framework for having better arguments in an
+                    increasingly polarized world
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-card text-card-foreground border rounded-lg overflow-hidden transition-all duration-200 hover:scale-105 hover:shadow-md">
+                <div className="h-40 bg-muted relative">
+                  <Image
+                    src="/placeholder.jpg"
+                    alt="Article thumbnail"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <div className="text-xs text-muted-foreground mb-1">
+                    MIT Technology Review • Karen Hao • February 2021
+                  </div>
+                  <h3 className="font-medium text-sm mb-1">
+                    The Messy Truth About Social Credit
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Excellent analysis that cuts through the hype and explores
+                    the nuanced reality
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-card text-card-foreground border rounded-lg overflow-hidden transition-all duration-200 hover:scale-105 hover:shadow-md">
+                <div className="h-40 bg-muted relative">
+                  <Image
+                    src="/placeholder.jpg"
+                    alt="Article thumbnail"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <div className="text-xs text-muted-foreground mb-1">
+                    Not Boring • Packy McCormick • May 2021
+                  </div>
+                  <h3 className="font-medium text-sm mb-1">
+                    The Great Online Game
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Changed how I think about career development in the internet
+                    age
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-card text-card-foreground border rounded-lg overflow-hidden transition-all duration-200 hover:scale-105 hover:shadow-md">
+                <div className="h-40 bg-muted relative">
+                  <Image
+                    src="/placeholder.jpg"
+                    alt="Article thumbnail"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <div className="text-xs text-muted-foreground mb-1">
+                    Astral Codex Ten • Scott Alexander • July 2020
+                  </div>
+                  <h3 className="font-medium text-sm mb-1">
+                    Meditations on Moloch
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Profound exploration of coordination problems in society
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-card text-card-foreground border rounded-lg overflow-hidden transition-all duration-200 hover:scale-105 hover:shadow-md">
+                <div className="h-40 bg-muted relative">
+                  <Image
+                    src="/placeholder.jpg"
+                    alt="Article thumbnail"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <div className="text-xs text-muted-foreground mb-1">
+                    Stratechery • Ben Thompson • August 2019
+                  </div>
+                  <h3 className="font-medium text-sm mb-1">
+                    Aggregation Theory
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Essential framework for understanding power in the internet
+                    economy
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-card text-card-foreground border rounded-lg overflow-hidden transition-all duration-200 hover:scale-105 hover:shadow-md">
+                <div className="h-40 bg-muted relative">
+                  <Image
+                    src="https://149909199.v2.pressablecdn.com/wp-content/uploads/2015/01/Edge1.png"
+                    alt="AI Revolution article thumbnail"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <div className="text-xs text-muted-foreground mb-1">
+                    <a
+                      href="https://waitbutwhy.com/2015/01/artificial-intelligence-revolution-1.html"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-primary"
+                    >
+                      Wait But Why • Tim Urban • January 2015
+                    </a>
+                  </div>
+                  <h3 className="font-medium text-sm mb-1">
+                    The AI Revolution: The Road to Superintelligence
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Prescient exploration of AI development and potential
+                    implications
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>

@@ -4,22 +4,24 @@
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run start` - Start production server
-- `npm run lint` - Run Biome linter and fix issues
+- `npm run lint` - Run Biome linter and fix issues (auto-fixes problems)
 - `npm run typecheck` - Run TypeScript type checking
 
 ## Style Guidelines
-- **Formatting**: Use Biome (configured in biome.json) with 2-space indentation
-- **Quotes**: Single quotes for strings, double quotes for JSX
-- **Semicolons**: Not required (added as needed)
-- **Imports**: Use `@/` path alias for src/ directory imports, sorted via Biome
-- **Types**: Strict TypeScript with explicit typing, avoid using `any`
-- **Naming**: Use camelCase for variables/functions, PascalCase for components/types
-- **Components**: React 19 with Server/Client Components (use 'use client' directive)
-- **CSS**: Tailwind CSS with shadcn/ui components
-- **Error Handling**: Properly catch promise rejections, use try/catch blocks
-- **State**: Use React hooks for state management
+- **Formatting**: Biome (2-space indentation, 80-char line width)
+- **Quotes**: Single quotes for strings, double quotes for JSX attributes
+- **Semicolons**: Optional (auto-added as needed)
+- **Imports**: Use `@/` path aliases (@/components, @/lib, etc.), sorted with Biome
+- **Types**: Strict TypeScript with explicit types, NEVER use `any` (enforced)
+- **Functions**: Arrow functions preferred, use parameter parens always
+- **Components**: React 19 with Server Components (use 'use client' directive when needed)
+- **CSS**: Tailwind CSS with shadcn/ui components, use cn() utility for conditionals
+- **Error Handling**: try/catch blocks required for async operations
+- **State**: Use React hooks (useState, useEffect) for state management
 
 ## Project Structure
 - `/src/app/` - Next.js app router pages
-- `/src/components/` - Reusable UI components
+- `/src/components/` - Reusable UI components (shadcn/ui in /components/ui)
 - `/src/lib/` - Utility functions and shared logic
+- `/src/hooks/` - Custom React hooks
+- `/public/` - Static assets (images, etc.)
