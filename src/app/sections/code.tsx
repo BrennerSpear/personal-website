@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import Link from 'next/link'
 import { GitHubProject } from '@/components/github-project'
+import Link from 'next/link'
+import React, { useEffect, useState } from 'react'
 
 // GitHub project type
 interface GitHubProjectType {
@@ -62,9 +62,7 @@ export default function Code() {
 
       {loadingProjects ? (
         <div className="py-8 text-center">
-          <p className="text-muted-foreground">
-            Loading GitHub projects...
-          </p>
+          <p className="text-muted-foreground">Loading GitHub projects...</p>
         </div>
       ) : projectError ? (
         <div className="py-4 text-center">

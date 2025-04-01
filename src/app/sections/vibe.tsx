@@ -1,7 +1,7 @@
 'use client'
 
-import React from 'react'
 import Link from 'next/link'
+import React from 'react'
 
 export default function Vibe() {
   return (
@@ -11,46 +11,34 @@ export default function Vibe() {
       </h2>
       <ul className="text-sm space-y-3">
         <li className="flex flex-col">
-          <Link
-            href="#"
-            className="text-primary hover:underline font-medium"
-          >
+          <Link href="#" className="text-primary hover:underline font-medium">
             Digital Garden
           </Link>
           <p className="text-muted-foreground text-xs">
-            A collection of interconnected thoughts and ideas on
-            technology and culture
+            A collection of interconnected thoughts and ideas on technology and
+            culture
           </p>
         </li>
         <li className="flex flex-col">
-          <Link
-            href="#"
-            className="text-primary hover:underline font-medium"
-          >
+          <Link href="#" className="text-primary hover:underline font-medium">
             Crypto Art Collection
           </Link>
           <p className="text-muted-foreground text-xs">
-            Curated NFT art pieces exploring the intersection of
-            technology and creativity
+            Curated NFT art pieces exploring the intersection of technology and
+            creativity
           </p>
         </li>
         <li className="flex flex-col">
-          <Link
-            href="#"
-            className="text-primary hover:underline font-medium"
-          >
+          <Link href="#" className="text-primary hover:underline font-medium">
             Ambient Music Project
           </Link>
           <p className="text-muted-foreground text-xs">
-            Generative audio experiments created with algorithmic
-            composition techniques
+            Generative audio experiments created with algorithmic composition
+            techniques
           </p>
         </li>
         <li className="flex flex-col">
-          <Link
-            href="#"
-            className="text-primary hover:underline font-medium"
-          >
+          <Link href="#" className="text-primary hover:underline font-medium">
             Photography Series: Urban Patterns
           </Link>
           <p className="text-muted-foreground text-xs">
@@ -58,10 +46,7 @@ export default function Vibe() {
           </p>
         </li>
         <li className="flex flex-col">
-          <Link
-            href="#"
-            className="text-primary hover:underline font-medium"
-          >
+          <Link href="#" className="text-primary hover:underline font-medium">
             Reading List & Notes
           </Link>
           <p className="text-muted-foreground text-xs">

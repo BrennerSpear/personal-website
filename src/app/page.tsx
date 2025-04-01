@@ -14,12 +14,12 @@ import {
 
 // Import section components
 import About from '@/app/sections/about'
-import Essays from '@/app/sections/essays'
-import Code from '@/app/sections/code'
-import Vibe from '@/app/sections/vibe'
-import Skiing from '@/app/sections/skiing'
 import Articles from '@/app/sections/articles'
 import Books from '@/app/sections/books'
+import Code from '@/app/sections/code'
+import Essays from '@/app/sections/essays'
+import Skiing from '@/app/sections/skiing'
+import Vibe from '@/app/sections/vibe'
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState<

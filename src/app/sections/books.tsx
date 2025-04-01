@@ -1,7 +1,7 @@
 'use client'
 
-import React from 'react'
 import Image from 'next/image'
+import React from 'react'
 
 // Book recommendation type
 interface Book {
@@ -31,7 +31,8 @@ const learningBooks: Book[] = [
     year: 2012,
     coverUrl:
       'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1355117137i/13589153.jpg',
-    goodreadsUrl: 'https://www.goodreads.com/book/show/13589153-how-to-create-a-mind',
+    goodreadsUrl:
+      'https://www.goodreads.com/book/show/13589153-how-to-create-a-mind',
     description:
       'Fascinating exploration of reverse-engineering the human brain and the future of artificial intelligence',
   },
@@ -41,7 +42,8 @@ const learningBooks: Book[] = [
     year: 2012,
     coverUrl:
       'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1534528902i/11324722.jpg',
-    goodreadsUrl: 'https://www.goodreads.com/book/show/11324722-the-righteous-mind',
+    goodreadsUrl:
+      'https://www.goodreads.com/book/show/11324722-the-righteous-mind',
     description:
       'Illuminating insights into moral psychology and why good people are divided by politics and religion',
   },
@@ -55,7 +57,8 @@ const enjoymentBooks: Book[] = [
     year: 2011,
     coverUrl:
       'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1500930947i/9969571.jpg',
-    goodreadsUrl: 'https://www.goodreads.com/book/show/9969571-ready-player-one',
+    goodreadsUrl:
+      'https://www.goodreads.com/book/show/9969571-ready-player-one',
     description:
       'Thrilling virtual reality adventure filled with 80s pop culture nostalgia and a high-stakes digital treasure hunt',
   },
@@ -75,7 +78,8 @@ const enjoymentBooks: Book[] = [
     year: 2022,
     coverUrl:
       'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1636978687i/58784475.jpg',
-    goodreadsUrl: 'https://www.goodreads.com/book/show/58784475-tomorrow-and-tomorrow-and-tomorrow',
+    goodreadsUrl:
+      'https://www.goodreads.com/book/show/58784475-tomorrow-and-tomorrow-and-tomorrow',
     description:
       'Beautiful story about friendship, love, and creativity through the lens of video game development across decades',
   },
@@ -85,7 +89,8 @@ const enjoymentBooks: Book[] = [
     year: 2021,
     coverUrl:
       'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1597695864i/54493401.jpg',
-    goodreadsUrl: 'https://www.goodreads.com/book/show/54493401-project-hail-mary',
+    goodreadsUrl:
+      'https://www.goodreads.com/book/show/54493401-project-hail-mary',
     description:
       'Exhilarating space adventure about a lone astronaut with amnesia who must save humanity with unexpected alien help',
   },
@@ -185,7 +190,7 @@ export default function Books() {
           </div>
         ))}
       </div>
-      
+
       <div className="mt-6 text-center">
         <a
           href="https://www.goodreads.com/user/show/71264931-brenner-spear"

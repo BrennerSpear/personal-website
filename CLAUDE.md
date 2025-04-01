@@ -25,3 +25,6 @@
 - `/src/lib/` - Utility functions and shared logic
 - `/src/hooks/` - Custom React hooks
 - `/public/` - Static assets (images, etc.)
+
+## Committing Changes
+- always lint and typecheck before committing
