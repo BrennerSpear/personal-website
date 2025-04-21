@@ -16,7 +16,7 @@ interface Book {
 // Books I've learned from
 const learningBooks: Book[] = [
   {
-    title: 'Foundation',
+    title: 'Foundation (7-part series)',
     author: 'Isaac Asimov',
     year: 1951,
     coverUrl:
